@@ -1,7 +1,5 @@
 # Docker image basic Stata image
 
-> **DEPRECATED: the `dataeditors` Docker Hub organization has moved to `sscng`.** New images are published only to [https://hub.docker.com/u/sscng](https://hub.docker.com/u/sscng) (same image names and tags). Please update references from `dataeditors/stata...` to `sscng/stata...`.
-
 The primary source for this README is at [https://github.com/AEADataEditor/docker-stata](https://github.com/AEADataEditor/docker-stata).
 
 ## Purpose

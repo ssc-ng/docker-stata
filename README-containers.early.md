@@ -1,11 +1,5 @@
 # Docker image basic Stata image
 
-> **DEPRECATED: this image has moved to the `sscng` Docker Hub organization.**
-> The `dataeditors` organization is deprecated and will no longer receive updates.
-> Please use [`sscng/stata{{ full_version }}`](https://hub.docker.com/r/sscng/stata{{ full_version }}) (same image names and tags, e.g., `sscng/stata{{ full_version }}-mp:<tag>`) instead,
-> and update any `FROM dataeditors/...` or `docker pull dataeditors/...` references.
-> All images are listed at [https://hub.docker.com/u/sscng](https://hub.docker.com/u/sscng).
-
 For complete information, see [https://github.com/AEADataEditor/docker-stata](https://github.com/AEADataEditor/docker-stata).
 
 ## Stata in Docker
