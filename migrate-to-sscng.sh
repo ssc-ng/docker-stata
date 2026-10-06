@@ -4,6 +4,8 @@
 # Copies server-side with `docker buildx imagetools create`, so no pull/push
 # of layers is needed and multi-arch manifests are preserved.
 #
+# Tags containing "-broken" are skipped.
+#
 # Requires: docker (buildx), curl, jq; `docker login` with push rights on sscng.
 
 SRC=${SRC:-dataeditors}
@@ -44,10 +46,15 @@ hub_list() {
 repos=$(hub_list "https://hub.docker.com/v2/repositories/${SRC}/?page_size=100" name) || exit 1
 [[ -z $repos ]] && { echo "No repositories found under $SRC" >&2; exit 1; }
 
-ok=0; fail=0
+ok=0; fail=0; skip=0
 for repo in $repos; do
     tags=$(hub_list "https://hub.docker.com/v2/repositories/${SRC}/${repo}/tags?page_size=100" name) || { fail=$((fail+1)); continue; }
     for tag in $tags; do
+        if [[ $tag == *-broken* ]]; then
+            echo "SKIP (broken): ${SRC}/${repo}:${tag}"
+            skip=$((skip+1))
+            continue
+        fi
         echo "${SRC}/${repo}:${tag} -> ${DST}/${repo}:${tag}"
         [[ -n $DRYRUN ]] && continue
         if docker buildx imagetools create -t "${DST}/${repo}:${tag}" "${SRC}/${repo}:${tag}"; then
@@ -59,5 +66,5 @@ for repo in $repos; do
     done
 done
 
-echo "Done: $ok retagged, $fail failed."
+echo "Done: $ok retagged, $skip skipped (-broken), $fail failed."
 [[ $fail -eq 0 ]]
