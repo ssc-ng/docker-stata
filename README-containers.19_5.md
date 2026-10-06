@@ -7,7 +7,7 @@
 
 ```
 # Adjust as necessary
-FROM dataeditors/stata18-se:2026-01-13
+FROM sscng/stata18-se:2026-01-13
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
          python3 \

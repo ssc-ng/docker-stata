@@ -2,7 +2,7 @@
 
 VERSION=${VERSION:-18}
 [[ -z $1 ]] && TAG=$(date +%F) || TAG=$1
-MYHUBID=dataeditors
+MYHUBID=sscng
 MYIMG=stata${VERSION}
 SYLABSID=vilhuberlars
 
@@ -19,14 +19,14 @@ echo "======== Push to Sylabs.io repository (under $MYHUBID ) ======="
 
 
 echo "Ready to push?"
-echo "  singularity push stata${VERSION}.sif  library://$SYLABSID/$MYHUBID/${MYIMG}:${TAG} "
+echo "  singularity push stata${VERSION}.sif  library://$SYLABSID/dataeditors/${MYIMG}:${TAG} "
 read answer
 case $answer in 
    y|Y)
    singularity remote login SylabsCloud
    singularity remote use SylabsCloud
    singularity push stata${VERSION}.sif \
-    library://$SYLABSID/$MYHUBID/${MYIMG}:${TAG}
+    library://$SYLABSID/dataeditors/${MYIMG}:${TAG}
     ;;
     *)
     exit 0

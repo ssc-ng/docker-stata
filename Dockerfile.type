@@ -5,7 +5,7 @@ ARG CAPTURE_VERSION
 ARG BASIS=base
 ARG TAG=latest
 
-FROM dataeditors/stata${CAPTURE_VERSION}-${BASIS}:$TAG
+FROM sscng/stata${CAPTURE_VERSION}-${BASIS}:$TAG
 
 # now add the desired version
 ARG STATA_VERSION

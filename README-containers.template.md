@@ -1,11 +1,5 @@
 # Docker image basic Stata image
 
-> **DEPRECATED: this image has moved to the `sscng` Docker Hub organization.**
-> The `dataeditors` organization is deprecated and will no longer receive updates.
-> Please use [`sscng/stata{{ full_version }}`](https://hub.docker.com/r/sscng/stata{{ full_version }}) (same image names and tags, e.g., `sscng/stata{{ full_version }}-mp:<tag>`) instead,
-> and update any `FROM dataeditors/...` or `docker pull dataeditors/...` references.
-> All images are listed at [https://hub.docker.com/u/sscng](https://hub.docker.com/u/sscng).
-
 For complete information, see [https://github.com/AEADataEditor/docker-stata](https://github.com/AEADataEditor/docker-stata).
 
 ## Stata in Docker
@@ -37,13 +31,13 @@ Stata comes in three editions: Basic Edition (`be`), Standard Edition (`se`), an
 - The by-type images are available for Stata 18 and higher. For (monolithic) images for earlier versions of Stata 18 and below, 
 see
 
-- <https://hub.docker.com/r/dataeditors/stata18>
-- <https://hub.docker.com/r/dataeditors/stata17>
-- <https://hub.docker.com/r/dataeditors/stata16>
-- <https://hub.docker.com/r/dataeditors/stata15>
-- <https://hub.docker.com/r/dataeditors/stata14>
-- <https://hub.docker.com/r/dataeditors/stata13>
-- <https://hub.docker.com/r/dataeditors/stata12>
+- <https://hub.docker.com/r/sscng/stata18>
+- <https://hub.docker.com/r/sscng/stata17>
+- <https://hub.docker.com/r/sscng/stata16>
+- <https://hub.docker.com/r/sscng/stata15>
+- <https://hub.docker.com/r/sscng/stata14>
+- <https://hub.docker.com/r/sscng/stata13>
+- <https://hub.docker.com/r/sscng/stata12>
 
 ### Components
 
@@ -63,7 +57,7 @@ The base image serves all other images, but is not useful on its own - it does n
 
 ```
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-dataeditors/stata{{ full_version }}-base  test  90364eb9a9d9  9 minutes ago   795MB
+sscng/stata{{ full_version }}-base  test  90364eb9a9d9  9 minutes ago   795MB
 ```
 
 
@@ -76,9 +70,9 @@ These images have only the relevant command line binaries. They are fully functi
 
 ```
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-dataeditors/stata{{ full_version }}-mp    test  4c1580c00abd  9 minutes ago   1.18GB
-dataeditors/stata{{ full_version }}-se    test  662e2d09026e  9 minutes ago   1.12GB
-dataeditors/stata{{ full_version }}-be    test  5f87e594ddbf  9 minutes ago   1.12GB
+sscng/stata{{ full_version }}-mp    test  4c1580c00abd  9 minutes ago   1.18GB
+sscng/stata{{ full_version }}-se    test  662e2d09026e  9 minutes ago   1.12GB
+sscng/stata{{ full_version }}-be    test  5f87e594ddbf  9 minutes ago   1.12GB
 ```
 
 #### Command line images for interactive development
@@ -88,9 +82,9 @@ These images have help files, and are suitable for interactive development, for 
 
 ```
 REPOSITORY                  TAG   IMAGE ID      CREATED         SIZE
-dataeditors/stata{{ full_version }}-mp-i  test  642e4a006672  9 minutes ago   1.41GB
-dataeditors/stata{{ full_version }}-se-i  test  76786bda8680  9 minutes ago   1.32GB
-dataeditors/stata{{ full_version }}-be-i  test  f5600d1fe84d  9 minutes ago   1.32GB
+sscng/stata{{ full_version }}-mp-i  test  642e4a006672  9 minutes ago   1.41GB
+sscng/stata{{ full_version }}-se-i  test  76786bda8680  9 minutes ago   1.32GB
+sscng/stata{{ full_version }}-be-i  test  f5600d1fe84d  9 minutes ago   1.32GB
 ```
 
 
@@ -100,9 +94,9 @@ For select interactive images, a version is installed with Python support. These
 
 ```
 REPOSITORY                          TAG   IMAGE ID      CREATED         SIZE
-dataeditors/stata{{ full_version }}-mp-i-python  2026-02-18  555452384561   3 weeks ago      2.04GB
-dataeditors/stata{{ full_version }}-se-i-python  2026-02-18  17745f15fdf1   3 weeks ago      1.95GB
-dataeditors/stata{{ full_version }}-be-i-python  2026-02-18  db2b73f72f1b   3 weeks ago      1.95GB
+sscng/stata{{ full_version }}-mp-i-python  2026-02-18  555452384561   3 weeks ago      2.04GB
+sscng/stata{{ full_version }}-se-i-python  2026-02-18  17745f15fdf1   3 weeks ago      1.95GB
+sscng/stata{{ full_version }}-be-i-python  2026-02-18  db2b73f72f1b   3 weeks ago      1.95GB
 ```
 
 #### Interactive with GUI
@@ -112,9 +106,9 @@ The GUI (`X`) variants start with the `-i` variant, and add the `x` binaries. Th
 
 ```
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-dataeditors/stata{{ full_version }}-mp-x  test  2fbc841cba25  9 minutes ago   1.92GB
-dataeditors/stata{{ full_version }}-se-x  test  dedf75051503  9 minutes ago   1.76GB
-dataeditors/stata{{ full_version }}-be-x  test  07b1b687e984  9 minutes ago   1.76GB
+sscng/stata{{ full_version }}-mp-x  test  2fbc841cba25  9 minutes ago   1.92GB
+sscng/stata{{ full_version }}-se-x  test  dedf75051503  9 minutes ago   1.76GB
+sscng/stata{{ full_version }}-be-x  test  07b1b687e984  9 minutes ago   1.76GB
 ```
 
 ## Special features
@@ -130,7 +124,7 @@ Containers have minimal additional Linux commands. If any are necessary, you wil
 
 ## Accessing the images
 
-You can browse all provided images at [https://hub.docker.com/u/dataeditors](https://hub.docker.com/u/dataeditors).
+You can browse all provided images at [https://hub.docker.com/u/sscng](https://hub.docker.com/u/sscng).
 
 
 
