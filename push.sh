@@ -32,7 +32,7 @@ TEMPLATE="README-containers.template.md"
 EXTRAMD="README-containers.$VERSION.md"
 OUTPUTMD="README-containers.md"
 
-MYHUBID=dataeditors
+MYHUBID=sscng
 MYIMG=stata${VERSION}
 
 # Generate README-containers.md from template

@@ -7,7 +7,7 @@ ARG CAPTURE_VERSION
 ARG TYPE=unknown
 ARG TAG=latest
 
-FROM dataeditors/stata${CAPTURE_VERSION}-${TYPE}-i:$TAG
+FROM sscng/stata${CAPTURE_VERSION}-${TYPE}-i:$TAG
 
 USER root
 

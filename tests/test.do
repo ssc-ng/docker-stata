@@ -1,4 +1,4 @@
-* Functional smoke test for the dataeditors/stata* Docker images.
+* Functional smoke test for the sscng/stata* Docker images.
 *
 * REQUIRES a valid Stata license mounted at /usr/local/stata/stata.lic.
 * Run via tests/run-tests.sh -l <stata.lic>; do not run this file directly.

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Smoke tests for the dataeditors/stata* Docker images.
+# Smoke tests for the sscng/stata* Docker images.
 #
 # The library-loading checks run with no license and catch regressions like
 # issue #32 (missing libtinfo.so.5). The checks that actually execute Stata
@@ -9,7 +9,7 @@
 # Usage:
 #   tests/run-tests.sh -i <image> [-l <stata.lic>]
 #
-#   -i   image reference to test, e.g. dataeditors/stata18-mp:2026-06-02
+#   -i   image reference to test, e.g. sscng/stata18-mp:2026-06-02
 #   -l   path to a Stata license file (stata.lic). Optional.
 #   -h   this help
 #

@@ -51,7 +51,7 @@ TEMPLATE="README-containers.template.md"
 EXTRAMD="README-containers.$VERSION.md"
 OUTPUTMD="README-containers.md"
 
-MYHUBID=dataeditors
+MYHUBID=sscng
 MYIMG=stata${VERSION}
 
 echo "Pulling images with tag $TAG for Stata $VERSION..."

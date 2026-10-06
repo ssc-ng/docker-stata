@@ -35,7 +35,7 @@ Set the `TAG`, `MYHUBID` and `MYIMG` accordingly, if intending to rebuild. `VERS
 ```
 VERSION=18
 TAG=$(date +%F)
-MYHUBID=dataeditors
+MYHUBID=sscng
 MYIMG=stata${VERSION}
 ```
 
@@ -88,7 +88,7 @@ This will generate a lot of output, and may take a while:
  => exporting to image                                                     0.0s
  => => exporting layers                                                    0.0s
  => => writing image sha256:2dc159dee0413040c99b02f885eb7a6559b647cd6e86a  0.0s
- => => naming to docker.io/dataeditors/stata18:2023-10-09                  0.0s
+ => => naming to docker.io/sscng/stata18:2023-10-09                  0.0s
 ```
 
 Once done, you should have multiple images:
@@ -102,16 +102,16 @@ output:
 
 ```
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-dataeditors/stata18-mp-x  test  2fbc841cba25  9 minutes ago   1.92GB
-dataeditors/stata18-mp-i  test  642e4a006672  9 minutes ago   1.41GB
-dataeditors/stata18-mp    test  4c1580c00abd  9 minutes ago   1.18GB
-dataeditors/stata18-se-x  test  dedf75051503  9 minutes ago   1.76GB
-dataeditors/stata18-se-i  test  76786bda8680  9 minutes ago   1.32GB
-dataeditors/stata18-se    test  662e2d09026e  9 minutes ago   1.12GB
-dataeditors/stata18-be-x  test  07b1b687e984  9 minutes ago   1.76GB
-dataeditors/stata18-be-i  test  f5600d1fe84d  9 minutes ago   1.32GB
-dataeditors/stata18-be    test  5f87e594ddbf  9 minutes ago   1.12GB
-dataeditors/stata18-base  test  90364eb9a9d9  9 minutes ago   795MB
+sscng/stata18-mp-x  test  2fbc841cba25  9 minutes ago   1.92GB
+sscng/stata18-mp-i  test  642e4a006672  9 minutes ago   1.41GB
+sscng/stata18-mp    test  4c1580c00abd  9 minutes ago   1.18GB
+sscng/stata18-se-x  test  dedf75051503  9 minutes ago   1.76GB
+sscng/stata18-se-i  test  76786bda8680  9 minutes ago   1.32GB
+sscng/stata18-se    test  662e2d09026e  9 minutes ago   1.12GB
+sscng/stata18-be-x  test  07b1b687e984  9 minutes ago   1.76GB
+sscng/stata18-be-i  test  f5600d1fe84d  9 minutes ago   1.32GB
+sscng/stata18-be    test  5f87e594ddbf  9 minutes ago   1.12GB
+sscng/stata18-base  test  90364eb9a9d9  9 minutes ago   795MB
 ```
 
 ## Test the image
@@ -122,7 +122,7 @@ PyStata) require a license file passed with `-l <stata.lic>`. See
 [`tests/README.md`](tests/README.md).
 
 ```
-tests/run-tests.sh -i dataeditors/stata18-mp:2026-06-02 -l /path/to/stata.lic
+tests/run-tests.sh -i sscng/stata18-mp:2026-06-02 -l /path/to/stata.lic
 ```
 
 ## Publish the image 
@@ -134,7 +134,7 @@ The resulting docker image(s) can be uploaded to [Docker Hub](https://hub.docker
 docker push $MYHUBID/${MYIMG}:$TAG
 ```
 
-You can browse the provided images at [https://hub.docker.com/u/dataeditors](https://hub.docker.com/u/dataeditors):
+You can browse the provided images at [https://hub.docker.com/u/sscng](https://hub.docker.com/u/sscng):
 
 ![Screenshot of repository for dataeditors](assets/docker-hub-dataeditors.png)
 
@@ -160,7 +160,7 @@ project/
 
 ### Using pre-built images
 
-Using a pre-built image on [Docker Hub](https://hub.docker.com/u/dataeditors) to run a program. 
+Using a pre-built image on [Docker Hub](https://hub.docker.com/u/sscng) to run a program. 
 
 > NOTE: because Stata is proprietary software, we need to mount a license file. 
 
@@ -172,7 +172,7 @@ For all the subsequent `docker run` commands, we will use similar environment va
 ```
 VERSION=18
 TAG=2023-10-14
-MYHUBID=dataeditors
+MYHUBID=sscng
 MYIMG=stata${VERSION}
 TYPE=mp
 STATALIC="$(pwd)/stata.lic.${VERSION}"
@@ -183,7 +183,7 @@ or
 ```
 VERSION=17
 TAG=2023-03-08
-MYHUBID=dataeditors
+MYHUBID=sscng
 MYIMG=stata${VERSION}
 TYPE=mp
 STATALIC="$(find $HOME/Dropbox/ -name stata.lic.$VERSION | tail -1)"
@@ -221,7 +221,7 @@ We have also converted the Docker image to a Singularity Image File (SIF),
 sudo singularity build stata${VERSION}.sif docker-daemon://${MYHUBID}/${MYIMG}:${TAG}
 ```
 
-and uploaded the resultant SIF file to the Sylabs.io servers ([library/vilhuberlars/dataeditors/stata17](https://cloud.sylabs.io/library/vilhuberlars/dataeditors/stata17)), so it can be used directly in a way similar to DockerHub:
+and uploaded the resultant SIF file to the Sylabs.io servers ([library/vilhuberlars/sscng/stata17](https://cloud.sylabs.io/library/vilhuberlars/sscng/stata17)), so it can be used directly in a way similar to DockerHub:
 
 ```
 SYLABSID=vilhuberlars
@@ -273,7 +273,7 @@ graph export "${results}/figure1.png"
 
 ```
 # syntax=docker/dockerfile:1.2
-FROM dataeditors/stata18:2024-02-14
+FROM sscng/stata18:2024-02-14
 # this runs your setup code 
 COPY code/setup.do setup.do
 RUN --mount=type=secret,id=statalic,dst=/usr/local/stata/stata.lic /usr/local/stata/stata-mp do /setup.do

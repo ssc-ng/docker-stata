@@ -38,7 +38,7 @@ Ready?
 EOF
 read
 
-MYHUBID=dataeditors
+MYHUBID=sscng
 MYIMG=stata${VERSION}
 
 # define STATA_VERSION

@@ -1,6 +1,6 @@
 # Tests
 
-Smoke tests for the built `dataeditors/stata*` images.
+Smoke tests for the built `sscng/stata*` images.
 
 ## A Stata license is required for most of the tests
 
@@ -23,10 +23,10 @@ never copied into an image or committed.
 
 ```bash
 # library checks only
-tests/run-tests.sh -i dataeditors/stata18-mp:2026-06-02
+tests/run-tests.sh -i sscng/stata18-mp:2026-06-02
 
 # full run
-tests/run-tests.sh -i dataeditors/stata18-mp:2026-06-02 -l /path/to/stata.lic
+tests/run-tests.sh -i sscng/stata18-mp:2026-06-02 -l /path/to/stata.lic
 ```
 
 Test one tag across every variant:
@@ -34,7 +34,7 @@ Test one tag across every variant:
 ```bash
 VERSION=18; TAG=2026-06-02; LIC=/path/to/stata.lic
 for v in be se mp be-i se-i mp-i be-x se-x mp-x be-i-python se-i-python mp-i-python; do
-    tests/run-tests.sh -i "dataeditors/stata${VERSION}-${v}:${TAG}" -l "$LIC" || break
+    tests/run-tests.sh -i "sscng/stata${VERSION}-${v}:${TAG}" -l "$LIC" || break
 done
 ```
 
