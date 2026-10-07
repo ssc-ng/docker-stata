@@ -13,7 +13,8 @@ where
     - -h: this helpfile
 
 This script pulls down a Stata version with specified tag, tags it as "latest", 
-pushes that tag, and updates the README using the early.md template.
+pushes that tag, and regenerates README-containers.md from the template
+(or from the early template, with -e).
 EOF
 exit 2
 fi
@@ -47,7 +48,7 @@ fi
 
 SHORTDESC="$(cat "$(dirname "$0")/SHORTDESC")"
 TEMPLATE="README-containers.template.md"
-[[ -n $EARLY ]] && TEMPLATE="README-containers.early.md"
+(( EARLY )) && TEMPLATE="README-containers.early.md"
 EXTRAMD="README-containers.$VERSION.md"
 OUTPUTMD="README-containers.md"
 

@@ -1,4 +1,4 @@
-# Docker image basic Stata image
+# Basic Stata container image
 
 The primary source for this README is at [https://github.com/ssc-ng/docker-stata](https://github.com/ssc-ng/docker-stata).
 
@@ -60,6 +60,14 @@ However, since 2023-10, I have restructured the images to be leaner, but this me
 - If you wish to use the image for interactive development, help files are useful. The `-i` suffix indicates that these are images for interactive development (e.g., `stata18-mp-i`.
 - If you wish to run the GUI version of Stata, you will want to use the `-x` images as a basis. NOTE THAT I DO NOT USE THESE, AND THEY ARE NOT FUNCTIONAL because they are missing many X11 libraries. You will need to base your image on these.
  
+### Capture a local install
+
+The build currently requires a local, licensed Stata install on the build machine (in `/usr/local/stata${VERSION}`, or e.g. `/usr/local/statanow18` for StataNow, coded as `-v 18_5`). `capture.sh` copies that install, removes the license, and splits it into tarballs (`base`, `docs`, `help`, and `be`/`se`/`mp` plus their `x` variants) in `bin-exclude/`, named with the capture date (`-c`, default today):
+
+```
+./capture.sh -v 18
+```
+
 To build all these images from captures of a workstation install, a convenience script `build.sh` is provided. It is invoked with
 
 ```
@@ -132,6 +140,12 @@ The resulting docker image(s) can be uploaded to [Docker Hub](https://hub.docker
 
 ```
 docker push $MYHUBID/${MYIMG}:$TAG
+```
+
+To promote a published tag to `latest`, `set-latest.sh` pulls each `be`/`se`/`mp` image at that tag, retags and pushes it as `latest`, updates the Docker Hub description (`docker pushrm`), and regenerates `README-containers.md` from the template:
+
+```
+./set-latest.sh -v 18 -t 2023-10-14
 ```
 
 You can browse the provided images at [https://hub.docker.com/u/sscng](https://hub.docker.com/u/sscng):

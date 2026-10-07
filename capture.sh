@@ -46,7 +46,7 @@ read
 TARLOC=bin-exclude
 TARBASE=$(pwd)/bin-exclude/stata-installed-$VERSION
 TARFILE=${TARBASE}.tgz
-VTARFILE=${TARBASE}-$(date +%F)
+VTARFILE=${TARBASE}-${CAPTURE}
 TMP=/mnt/local/fast_home/$USER/tmp
 BUILD=$TMP/stata-build
 # Is this StataNow or regular?
