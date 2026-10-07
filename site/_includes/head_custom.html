@@ -1,0 +1,14 @@
+<!-- just-the-docs injects this file into <head> on every page
+     (https://just-the-docs.com/docs/customization/#custom-head).
+
+     The picker script lives in an external asset rather than inline in
+     index.html because the theme pipes page HTML through
+     jekyll-compress-html, whose whitespace collapse does not exempt
+     inline <script> contents; static assets are copied verbatim and are
+     safe. Only pages that opt in via `picker: true` front matter load
+     it, since the script wires up picker-only elements at top level and
+     would throw on any other page. `defer` runs it after the document
+     is parsed, matching its former position at the end of <body>. -->
+{% if page.picker %}
+<script src="{{ '/assets/js/picker.js' | relative_url }}" defer></script>
+{% endif %}

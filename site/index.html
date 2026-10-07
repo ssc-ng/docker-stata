@@ -1,0 +1,115 @@
+---
+layout: default
+title: Home
+nav_order: 1
+picker: true
+description: "Stata container images on Docker Hub, with a picker for every version, edition and flavor"
+---
+  <div class="kicker">docker-stata · Stata container images</div>
+  <h1>Choose a container image</h1>
+  <p class="lede">Choose a Stata version, edition and flavor, and this page writes
+    the pull command, a starter <code>Dockerfile</code> (or Compose, Podman or
+    Apptainer/Singularity file) and the commands to build and run it on Linux,
+    macOS or Windows. Only images that actually exist are offered.</p>
+
+  <details class="intro">
+    <summary>What is a container?</summary>
+    <p>A container image packages an operating system, Stata and everything
+      around it into one file that runs the same way on any computer with
+      <a href="https://www.docker.com/">Docker</a> (or Podman, or Singularity).
+      Pinning an image tag pins the whole computing environment, which makes
+      automated runs and replication packages reproducible. See the
+      <a href="https://carpentries-incubator.github.io/docker-introduction/index.html">Carpentries
+      introduction to Docker</a> to learn more.</p>
+    <p>The images are published on
+      <a href="https://hub.docker.com/u/sscng">Docker Hub under <code>sscng</code></a>;
+      the build scripts and full documentation are in the
+      <a href="https://github.com/ssc-ng/docker-stata">docker-stata repository</a>.
+      The images contain Stata binaries &copy; StataCorp, posted with permission
+      <b>without a license</b>: you need a valid Stata license, mounted at run
+      time, to use them.</p>
+  </details>
+
+  <fieldset class="picker">
+    <legend>Image</legend>
+    <div class="fields">
+      <div><label for="vsel">Version
+        <span class="hint">(Now = StataNow)</span></label>
+        <select id="vsel"></select></div>
+      <div><label for="esel">Edition
+        <span class="hint">(must match your license)</span></label>
+        <select id="esel"></select></div>
+      <div><label for="fsel">Flavor <span class="hint">(suffix)</span></label>
+        <select id="fsel"></select></div>
+      <div><label for="tsel">Tag
+        <span class="hint">(date)</span></label>
+        <select id="tsel"></select></div>
+    </div>
+    <p class="license"><b>Choose the edition your Stata license is for.</b>
+      A Basic Edition license needs a <code>-be</code> image, Standard Edition
+      <code>-se</code>, and MP <code>-mp</code>. The license file you mount at run
+      time decides what Stata will actually run.</p>
+    <p class="note" id="note" hidden></p>
+
+    <details class="explain">
+      <summary>How the images are named, and what the tags mean</summary>
+      <p>An image name is built from its parts:</p>
+      <p class="anatomy"><code><span>sscng/stata</span><span class="a-v">19_5</span><span class="a-e">-se</span><span class="a-f">-i</span>:<span class="a-t">2026-08-12</span></code></p>
+      <dl>
+        <dt class="a-v">Version</dt>
+        <dd>The Stata version. A point release is written with an underscore:
+          <code>19_5</code> is Stata 19.5, i.e. <b>StataNow 19</b>, shown as
+          &ldquo;Now 19&rdquo; above. It is newer than <code>19</code>.</dd>
+        <dt class="a-e">Edition</dt>
+        <dd><code>-be</code> Basic, <code>-se</code> Standard, <code>-mp</code>
+          MP-Parallel. <b>This must correspond to your license.</b> The MP images
+          were built with the 32-core edition. Stata 18 and earlier versions
+          were also published as a single image per version, containing all
+          editions and no edition suffix.</dd>
+        <dt class="a-f">Flavor</dt>
+        <dd>No suffix: command line only, no help files. This is the smallest
+          image, made for automated runs. <code>-i</code>: adds the help files,
+          for interactive work. <code>-i-python</code>: the <code>-i</code>
+          image with Python installed (larger). <code>-x</code>: adds the GUI
+          binaries but not the X11 libraries they need, so it only works as the
+          base of your own image.</dd>
+        <dt class="a-t">Tag</dt>
+        <dd>The date the image was built, from a Stata installation updated as
+          of that date. A dated tag never changes, so pulling it again later
+          gives exactly the same image; use one in replication packages. Two
+          tags for the same version can differ in Stata update level or in the
+          underlying Ubuntu release. <code>latest</code> moves to the newest
+          promoted build: it is fine for trying things out, but not
+          reproducible.</dd>
+      </dl>
+    </details>
+  </fieldset>
+
+  <div class="tabs" role="tablist" id="tooltabs" aria-label="Container tool"></div>
+
+  <div class="results">
+    <div class="results-bar"><span>Pull the image</span>
+      <button id="copypull" type="button">Copy</button></div>
+    <pre id="pull"></pre>
+  </div>
+
+  <div class="results">
+    <div class="results-bar"><span id="filettl">Start a Dockerfile</span>
+      <button id="copyfile" type="button">Copy</button></div>
+    <pre id="file"></pre>
+  </div>
+
+  <h2 class="runhead">Build and run it</h2>
+  <p class="hint runhint">Save the file above in your project folder, next to
+    <code>main.do</code> and <code>code/setup.do</code>, then run these commands
+    from that folder. The Stata license is never copied into the image. During the
+    build it is passed as a secret, so <code>setup.do</code> can install packages.
+    At run time it is mounted read-only.</p>
+  <div class="tabs tabs-sub" role="tablist" id="ostabs" aria-label="Operating system"></div>
+  <div class="results">
+    <div class="results-bar"><span id="runttl">Commands</span>
+      <button id="copyrun" type="button">Copy</button></div>
+    <pre id="run"></pre>
+  </div>
+
+  <div id="stats"></div>

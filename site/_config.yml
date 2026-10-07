@@ -1,0 +1,28 @@
+title: docker-stata
+description: Stata container images on Docker Hub, with a picker for every version, edition and flavor
+
+theme: just-the-docs
+
+# The site is served from GitHub *project* Pages, i.e. under a path
+# prefix rather than at the host root. `url` is the origin only; the
+# prefix belongs in `baseurl`, and omitting it makes every theme asset
+# link resolve to the host root and 404 -- an entirely unstyled site.
+url: "https://ssc-ng.net"
+baseurl: "/docker-stata"
+
+search_enabled: false
+color_scheme: light
+
+nav_external_links:
+  - title: Docker Hub
+    url: https://hub.docker.com/u/sscng
+    hide_icon: false
+  - title: GitHub
+    url: https://github.com/ssc-ng/docker-stata
+    hide_icon: false
+
+exclude:
+  - DEPLOY-PREVIEW.md
+  - build_data.py
+  - Gemfile
+  - Gemfile.lock

@@ -2,6 +2,10 @@
 
 The primary source for this README is at [https://github.com/ssc-ng/docker-stata](https://github.com/ssc-ng/docker-stata).
 
+## Picking an image
+
+A web page at <https://ssc-ng.net/docker-stata/> lets you choose a Stata version, edition and flavor, and writes the `docker pull` command and a starter `Dockerfile`. Its image catalogue is read from the Docker Hub API at build time (`site/build_data.py`, run weekly and on demand by `.github/workflows/site.yml`); preview locally with `cd site && bundle exec jekyll serve`. Pull requests get a Cloudflare Pages preview; see [site/DEPLOY-PREVIEW.md](site/DEPLOY-PREVIEW.md) for the one-time setup.
+
 ## Purpose
 
 This Docker image is meant to isolate and stabilize that environment, and should be portable across
