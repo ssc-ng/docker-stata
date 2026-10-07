@@ -159,3 +159,47 @@ select {
   font-size: 1.15rem !important; margin: 2rem 0 .3rem !important;
 }
 .runhint { display: block; margin: 0 0 .2rem; max-width: 70ch; line-height: 1.55; }
+
+/* Collapsible sections */
+details.intro, details.explain {
+  border: 1px solid var(--line); border-radius: 8px; background: #fff;
+  padding: .7rem 1.1rem; margin-bottom: 1.1rem;
+}
+details summary {
+  cursor: pointer; font-family: Charter,Georgia,serif; font-weight: 700;
+  color: var(--navy); font-size: 1rem;
+}
+details[open] summary { margin-bottom: .5rem; }
+details.explain { margin: 1.1rem 0 0; font-size: .9rem; }
+details.explain summary { font-size: .95rem; }
+details.explain code, .license code {
+  font-family: ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  font-size: .9em; color: var(--navy);
+}
+
+/* The image picker is the page's main control: tinted panel */
+fieldset.picker {
+  background: var(--navy-soft); border: 2px solid var(--navy);
+  box-shadow: 0 4px 16px rgba(18,58,99,.12); margin-top: 1.4rem;
+}
+fieldset.picker legend {
+  background: var(--navy); color: #fff; border-radius: 4px; padding: .15rem .7rem;
+}
+.license {
+  margin: 1rem 0 0; font-size: .88rem; line-height: 1.55;
+  border-left: 4px solid var(--navy); background: #fff;
+  padding: .55rem .8rem; border-radius: 0 6px 6px 0;
+}
+
+/* Anatomy of an image name */
+.anatomy code { font-size: 1.05rem; background: none; border: none; padding: 0; }
+.anatomy span { padding: .05rem .1rem; border-radius: 3px; }
+.a-v { background: #dbe9f7; } .a-e { background: #fbe3c8; }
+.a-f { background: #dff2dd; } .a-t { background: #eadff5; }
+.explain dl { display: block !important; margin: .4rem 0 0; }
+.explain dt {
+  display: inline-block; font-weight: 700; text-align: left !important;
+  margin: .7rem 0 0 !important; padding: 0 .4rem !important; border-radius: 3px;
+}
+.explain dt::after { content: none !important; }
+.explain dd { display: block; margin: .25rem 0 0 0 !important; padding: 0 !important; line-height: 1.55; }
