@@ -1,6 +1,6 @@
 # Docker image basic Stata image
 
-The primary source for this README is at [https://github.com/AEADataEditor/docker-stata](https://github.com/AEADataEditor/docker-stata).
+The primary source for this README is at [https://github.com/ssc-ng/docker-stata](https://github.com/ssc-ng/docker-stata).
 
 ## Purpose
 

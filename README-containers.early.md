@@ -1,6 +1,6 @@
 # Docker image basic Stata image
 
-For complete information, see [https://github.com/AEADataEditor/docker-stata](https://github.com/AEADataEditor/docker-stata).
+For complete information, see [https://github.com/ssc-ng/docker-stata](https://github.com/ssc-ng/docker-stata).
 
 ## Stata in Docker
 
@@ -11,7 +11,7 @@ This Docker image is meant to serve as a basis for reproducible and automatable 
 ## Requirements
 
 You need a Stata license to run the image.
-See [https://github.com/AEADataEditor/docker-stata](https://github.com/AEADataEditor/docker-stata) for full instructions.
+See [https://github.com/ssc-ng/docker-stata](https://github.com/ssc-ng/docker-stata) for full instructions.
 
 
 ## Structure
