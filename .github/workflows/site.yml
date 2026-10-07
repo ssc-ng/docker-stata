@@ -1,0 +1,76 @@
+# Build and deploy the docker-stata website (site/ directory) via
+# Action-based GitHub Pages deployment using Jekyll (just-the-docs theme).
+#
+#   build:  runs on every PR, every push to main, weekly by cron, and on
+#           demand. First refreshes the image catalogue embedded in the
+#           picker script (site/assets/js/picker.js) from the Docker Hub
+#           API (site/build_data.py), then builds the Jekyll site and
+#           uploads the artifact. The refresh happens in CI only and lands
+#           in the deployed artifact; nothing is committed back.
+#   deploy: runs only for main (pushes, cron, manual runs), never PRs.
+#
+# New images are pushed to Docker Hub from a workstation, not from CI, so
+# nothing triggers a rebuild when a tag is pushed: run this workflow by
+# hand (Actions -> site -> Run workflow) after pushing, or wait for the
+# weekly run.
+#
+# Requires: repository Settings -> Pages -> Source = "GitHub Actions".
+
+name: site
+on:
+  push:
+    branches: [main]
+    paths: ["site/**", ".github/workflows/site.yml"]
+  pull_request:
+    paths: ["site/**", ".github/workflows/site.yml"]
+  schedule:
+    - cron: "30 6 * * 1"      # Mondays 06:30 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Refresh embedded image catalogue from Docker Hub
+        run: python3 site/build_data.py site/assets/js/picker.js
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: site
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+        working-directory: site
+      - name: Check the built site
+        # Every root-absolute link must carry the baseurl prefix, or the
+        # theme's stylesheets 404 on project Pages and the site deploys
+        # unstyled -- invisible in the build log, so checked here.
+        run: python3 -m unittest tests.test_site -v
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site/_site
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: https://ssc-ng.net/docker-stata/
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

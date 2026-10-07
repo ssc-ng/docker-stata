@@ -1,0 +1,137 @@
+/* Custom styles for docker-stata site (shared look with the ssc2 site)                                          */
+/* Loaded automatically by just-the-docs via @import "custom/custom"    */
+
+/* ------------------------------------------------------------------ */
+/* Brand colour tokens (Stata-GUI palette)                              */
+/* ------------------------------------------------------------------ */
+:root {
+  --navy:        #123a63;   /* Stata-GUI navy                          */
+  --navy-soft:   #e8eef5;
+  --ink:         #20242a;
+  --muted:       #5c6572;
+  --line:        #d7dde4;
+  --accent:      #1b6fae;
+  --console-bg:  #171b21;   /* Stata dark results window               */
+  --console-ink: #e6e9ec;
+  --console-dim: #8a949f;
+  --console-good:#7fd08c;   /* Stata result green                      */
+  --console-err: #e07a7a;   /* Stata error red                         */
+}
+
+/* ------------------------------------------------------------------ */
+/* Image-picker page (index.html)                               */
+/* ------------------------------------------------------------------ */
+
+.kicker {
+  font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: .4rem;
+}
+
+.lede {
+  color: var(--muted); margin: .6rem 0 2rem; max-width: 56ch;
+}
+.lede code {
+  font-family: ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  font-size: .9em; color: var(--navy);
+}
+
+fieldset {
+  border: 1px solid var(--line); border-radius: 8px; background: #fff;
+  padding: 1.25rem 1.25rem 1.4rem; margin-bottom: 1.1rem;
+}
+legend {
+  font-family: Charter,Georgia,serif; font-weight: 700; color: var(--navy);
+  padding: 0 .5rem; font-size: 1.05rem;
+}
+
+.hint { font-size: .8rem; color: var(--muted); font-weight: 400; }
+
+input[type=text] {
+  width: 100%; padding: .55rem .7rem; border: 1px solid var(--line);
+  border-radius: 6px; font: inherit;
+  font-family: ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  font-size: .95rem;
+}
+input[type=text]:focus, input[type=date]:focus, input[type=range]:focus-visible,
+button:focus-visible, input[type=checkbox]:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+.row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.check {
+  display: flex; gap: .55rem; align-items: flex-start;
+  font-weight: 400; font-size: .9rem; cursor: pointer;
+}
+.check input { margin-top: .22rem; accent-color: var(--navy); }
+.check b { font-weight: 600; }
+
+/* Stata results window */
+.results {
+  background: var(--console-bg); border-radius: 8px; overflow: hidden;
+  box-shadow: 0 6px 24px rgba(18,58,99,.18);
+}
+.results-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--navy); color: #dce7f2; font-size: .75rem;
+  letter-spacing: .08em; text-transform: uppercase; padding: .45rem .9rem;
+}
+.results-bar button {
+  font: inherit; letter-spacing: .08em; text-transform: uppercase;
+  background: transparent; border: 1px solid rgba(255,255,255,.45); color: #fff;
+  border-radius: 4px; padding: .2rem .7rem; cursor: pointer;
+}
+.results-bar button:hover { background: rgba(255,255,255,.12); }
+
+/* Override theme's pre styles inside the results window */
+.results pre {
+  padding: 1rem 1.1rem 1.15rem !important;
+  color: var(--console-ink) !important;
+  background: none !important;
+  border: none !important;
+  font: .88rem/1.65 ui-monospace,"Cascadia Code",Consolas,Menlo,monospace !important;
+  white-space: pre-wrap !important;
+  word-break: break-all !important;
+}
+.results pre .p  { color: var(--console-dim); }
+.results pre .cm { color: var(--console-dim); font-style: italic; }
+.results pre .opt { color: var(--console-good); }
+.results pre .err { color: var(--console-err); }
+
+.cursor {
+  display: inline-block; width: .55em; height: 1.05em;
+  background: var(--console-ink); vertical-align: -0.15em;
+  animation: blink 1.1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion:reduce) { .cursor { animation: none; } }
+
+select {
+  padding: .5rem .6rem; border: 1px solid var(--line); border-radius: 6px;
+  font: inherit; font-size: .9rem; background: #fff; max-width: 100%;
+}
+
+.intro p { margin: .5rem 0; }
+.intro a { color: var(--accent); }
+.intro code, .hint code, .note code {
+  font-family: ui-monospace,"Cascadia Code",Consolas,Menlo,monospace;
+  font-size: .9em; color: var(--navy);
+}
+.fields { display: grid; gap: 1rem 1.25rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+.fields label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: .3rem; }
+.fields select { width: 100%; }
+.fields select:disabled { opacity: .6; cursor: not-allowed; }
+.note {
+  font-size: .85rem; color: #8a6d1f; background: #fbf3da;
+  border-radius: 6px; padding: .5rem .8rem; margin: 1rem 0 0;
+}
+.note[hidden] { display: none; }
+.results + .results { margin-top: 1.1rem; }
+.results pre .kw { color: #8fc1ec; }
+.results-bar .ttl { text-transform: uppercase; }
+.results-bar a { color: #dce7f2; text-decoration: underline; }
+#stats {
+  margin-top: 2.2rem; font-size: .8rem; color: var(--muted); line-height: 1.7;
+}
+#stats a { color: var(--accent); }
+#stats code {
+  font-family: ui-monospace,Consolas,Menlo,monospace; color: var(--navy);
+}

@@ -1,0 +1,62 @@
+---
+layout: default
+title: Home
+nav_order: 1
+picker: true
+description: "Stata container images on Docker Hub, with a picker for every version, edition and flavor"
+---
+  <div class="kicker">docker-stata · Stata container images</div>
+  <h1>Pick a Stata container image</h1>
+  <p class="lede">Choose a Stata version, edition and flavor, and this page writes
+    the <code>docker pull</code> command and a starter <code>Dockerfile</code>
+    for it. Only images that actually exist are offered.</p>
+
+  <fieldset class="intro">
+    <legend>What is a container?</legend>
+    <p>A container image packages an operating system, Stata and everything
+      around it into one file that runs the same way on any computer with
+      <a href="https://www.docker.com/">Docker</a> (or Podman, or Singularity).
+      Pinning an image tag pins the whole computing environment, which makes
+      automated runs and replication packages reproducible. See the
+      <a href="https://carpentries-incubator.github.io/docker-introduction/index.html">Carpentries
+      introduction to Docker</a> to learn more.</p>
+    <p>The images are published on
+      <a href="https://hub.docker.com/u/sscng">Docker Hub under <code>sscng</code></a>;
+      the build scripts and full documentation are in the
+      <a href="https://github.com/ssc-ng/docker-stata">docker-stata repository</a>.
+      The images contain Stata binaries &copy; StataCorp, posted with permission
+      <b>without a license</b>: you need a valid Stata license, mounted at run
+      time, to use them.</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Image</legend>
+    <div class="fields">
+      <div><label for="vsel">Version
+        <span class="hint">(Now = StataNow)</span></label>
+        <select id="vsel"></select></div>
+      <div><label for="esel">Edition
+        <span class="hint">(<code>-be</code>, <code>-se</code>, <code>-mp</code>)</span></label>
+        <select id="esel"></select></div>
+      <div><label for="fsel">Flavor <span class="hint">(suffix)</span></label>
+        <select id="fsel"></select></div>
+      <div><label for="tsel">Tag
+        <span class="hint">(date)</span></label>
+        <select id="tsel"></select></div>
+    </div>
+    <p class="note" id="note" hidden></p>
+  </fieldset>
+
+  <div class="results">
+    <div class="results-bar"><span>Pull the image</span>
+      <button id="copypull" type="button">Copy</button></div>
+    <pre id="pull"></pre>
+  </div>
+
+  <div class="results">
+    <div class="results-bar"><span>Start a Dockerfile</span>
+      <button id="copydf" type="button">Copy</button></div>
+    <pre id="dockerfile"></pre>
+  </div>
+
+  <div id="stats"></div>
