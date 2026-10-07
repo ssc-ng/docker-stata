@@ -72,7 +72,14 @@ const TOOLS = {
   podman:      {label: "Podman",         file: "Containerfile"},
   singularity: {label: "Apptainer / Singularity", file: "stata.def"},
 };
-const OSES = {linux: "Linux", mac: "macOS", windows: "Windows (PowerShell)"};
+const OSES = {linux: "Linux", mac: "macOS (Terminal)", windows: "Windows (PowerShell)"};
+// Where each tool runs natively; elsewhere it needs a Linux VM.
+const NATIVE = {singularity: ["linux"]};
+const native = (t, o) => !NATIVE[t] || NATIVE[t].includes(o);
+const VM_NOTE = (t, o) =>
+  `${TOOLS[t].label} runs on Linux only. To use these images on ` +
+  `${o === "mac" ? "macOS" : "Windows"}, you need a Linux virtual machine, which ` +
+  `is not described here. Once inside it, follow the Linux instructions.`;
 // The OS tab starts on the visitor's own system.
 const UA = (typeof navigator !== "undefined" && navigator.userAgent) || "";
 let tool = "docker", os = /Windows/.test(UA) ? "windows" : /Mac OS X|Macintosh/.test(UA) ? "mac" : "linux";
@@ -184,7 +191,15 @@ function runCommands(c, t, o) {
   const ps = o === "windows";
   const lic = licPath(c.v.key)[o];
   const L = [];
+  const engine = t === "podman" ? "Podman installed" : "Docker Desktop" + (o === "mac" ? " or OrbStack" : "") + " running";
   const setLic = () => {
+    if (o === "mac") L.push(cm(`# Run in Terminal, with ${engine}`));
+    if (o === "windows") L.push(cm(`# Run in PowerShell, with ${engine}`));
+    if (t === "podman" && o !== "linux") {
+      L.push(cm("# First time only: create and start Podman's own machine"));
+      L.push("podman machine init; podman machine start");
+      L.push("");
+    }
     L.push(cm("# Where your Stata license is (adjust to your install)"));
     L.push(ps ? `$env:STATALIC = "${esc(lic)}"` : `export STATALIC="${esc(lic)}"`);
     L.push("");
@@ -216,11 +231,6 @@ function runCommands(c, t, o) {
       L.push(cmd([`${exe} run -it --rm`, ...extra, `-v ${licMount}`, `-v ${projMount}`,
                   `--entrypoint ${c.bin}`, "myproject"], ps));
     }
-    if (t === "podman" && o !== "linux") {
-      L.push("");
-      L.push(cm("# Podman on " + (o === "mac" ? "macOS" : "Windows") + " runs inside a VM: start it once with"));
-      L.push("podman machine init; podman machine start");
-    }
     return L;
   }
 
@@ -239,22 +249,9 @@ function runCommands(c, t, o) {
     return L;
   }
 
-  // Apptainer / Singularity: Linux only; macOS and Windows go through a Linux VM
-  if (o === "mac") {
-    L.push(cm("# Apptainer and Singularity run on Linux only. On a Mac, use a Linux VM,"));
-    L.push(cm("# e.g. Lima (brew install lima; limactl start --mount-writable; lima),"));
-    L.push(cm("# and run these commands inside it. Lima shares your home folder (and"));
-    L.push(cm("# your project in it), so copy stata.lic"));
-    L.push(cm("# there first: cp /Applications/StataNow/stata.lic ~/  (or .../Stata/)"));
-    L.push("");
-  } else if (o === "windows") {
-    L.push(cm("# Apptainer and Singularity run on Linux only. On Windows, install them"));
-    L.push(cm("# inside WSL2 (e.g. Ubuntu) and run these commands in the WSL shell."));
-    L.push(cm("# Windows drives appear under /mnt/c/..."));
-    L.push("");
-  }
-  const lin = o === "windows" ? licPath(c.v.key).windows.replace(/^C:\\/, "/mnt/c/").replace(/\\/g, "/")
-            : o === "mac" ? "$HOME/stata.lic" : licPath(c.v.key).linux;
+  // Apptainer / Singularity: Linux only
+  if (!native(t, o)) return null;
+  const lin = licPath(c.v.key).linux;
   L.push(cm("# Where your Stata license is (adjust to your install)"));
   L.push(`export STATALIC="${esc(lin)}"`);
   L.push("");
@@ -281,9 +278,11 @@ function render() {
     podman:      `podman pull docker.io/${c.image}:${c.tag}`,
     singularity: `apptainer pull docker://${c.image}:${c.tag}`,
   }[tool];
+  const ok = native(tool, os);
   $("pull").innerHTML =
     cm("# " + c.image + " on Docker Hub: https://hub.docker.com/r/" + c.image) + "\n" +
-    `<span class="p">$</span> ${esc(pull)}`;
+    (ok ? `<span class="p">$</span> ${esc(pull)}` : cm(`# (on ${os === "mac" ? "macOS" : "Windows"} this needs a Linux VM; see below)`));
+  $("copypull").hidden = !ok;
 
   const file = {
     docker:      () => dockerfile(c, ""),
@@ -295,7 +294,9 @@ function render() {
   $("filettl").textContent = "Start a " + TOOLS[tool].file;
   $("file").innerHTML = file.join("\n");
   $("runttl").textContent = TOOLS[tool].label + " on " + OSES[os];
-  $("run").innerHTML = runCommands(c, tool, os).join("\n");
+  const run = runCommands(c, tool, os);
+  $("run").innerHTML = run ? run.join("\n") : esc(VM_NOTE(tool, os));
+  $("copyrun").hidden = !run;
 
   const notes = [];
   if (c.fl === "x" && NOTES.x) notes.push(NOTES.x);
