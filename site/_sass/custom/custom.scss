@@ -135,3 +135,27 @@ select {
 #stats code {
   font-family: ui-monospace,Consolas,Menlo,monospace; color: var(--navy);
 }
+
+/* Tool and operating-system tabs above the result windows */
+.tabs {
+  display: flex; flex-wrap: wrap; gap: .3rem; margin: 1.6rem 0 .6rem;
+  border-bottom: 1px solid var(--line);
+}
+.tabs button {
+  font: inherit; font-size: .88rem; font-weight: 600; color: var(--muted);
+  background: none; border: 1px solid transparent; border-bottom: none;
+  border-radius: 6px 6px 0 0; padding: .45rem .9rem; cursor: pointer;
+  margin-bottom: -1px;
+}
+.tabs button:hover { color: var(--navy); }
+.tabs button[aria-selected=true] {
+  color: var(--navy); background: #fff; border-color: var(--line);
+  border-bottom: 1px solid #fff;
+}
+.tabs-sub { margin-top: .4rem; }
+.tabs-sub button { font-size: .82rem; padding: .35rem .8rem; }
+.runhead {
+  font-family: Charter,Georgia,serif; color: var(--navy);
+  font-size: 1.15rem !important; margin: 2rem 0 .3rem !important;
+}
+.runhint { display: block; margin: 0 0 .2rem; max-width: 70ch; line-height: 1.55; }

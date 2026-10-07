@@ -8,8 +8,9 @@ description: "Stata container images on Docker Hub, with a picker for every vers
   <div class="kicker">docker-stata · Stata container images</div>
   <h1>Pick a Stata container image</h1>
   <p class="lede">Choose a Stata version, edition and flavor, and this page writes
-    the <code>docker pull</code> command and a starter <code>Dockerfile</code>
-    for it. Only images that actually exist are offered.</p>
+    the pull command, a starter <code>Dockerfile</code> (or Compose, Podman or
+    Apptainer/Singularity file) and the commands to build and run it on Linux,
+    macOS or Windows. Only images that actually exist are offered.</p>
 
   <fieldset class="intro">
     <legend>What is a container?</legend>
@@ -47,6 +48,8 @@ description: "Stata container images on Docker Hub, with a picker for every vers
     <p class="note" id="note" hidden></p>
   </fieldset>
 
+  <div class="tabs" role="tablist" id="tooltabs" aria-label="Container tool"></div>
+
   <div class="results">
     <div class="results-bar"><span>Pull the image</span>
       <button id="copypull" type="button">Copy</button></div>
@@ -54,9 +57,22 @@ description: "Stata container images on Docker Hub, with a picker for every vers
   </div>
 
   <div class="results">
-    <div class="results-bar"><span>Start a Dockerfile</span>
-      <button id="copydf" type="button">Copy</button></div>
-    <pre id="dockerfile"></pre>
+    <div class="results-bar"><span id="filettl">Start a Dockerfile</span>
+      <button id="copyfile" type="button">Copy</button></div>
+    <pre id="file"></pre>
+  </div>
+
+  <h2 class="runhead">Build and run it</h2>
+  <p class="hint runhint">Save the file above in your project folder, next to
+    <code>main.do</code> and <code>code/setup.do</code>, then run these commands
+    from that folder. The Stata license is never copied into the image. During the
+    build it is passed as a secret, so <code>setup.do</code> can install packages.
+    At run time it is mounted read-only.</p>
+  <div class="tabs tabs-sub" role="tablist" id="ostabs" aria-label="Operating system"></div>
+  <div class="results">
+    <div class="results-bar"><span id="runttl">Commands</span>
+      <button id="copyrun" type="button">Copy</button></div>
+    <pre id="run"></pre>
   </div>
 
   <div id="stats"></div>

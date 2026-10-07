@@ -66,32 +66,51 @@ function onFlavor() {
   render();
 }
 
-function render() {
+const TOOLS = {
+  docker:      {label: "Docker",         file: "Dockerfile"},
+  compose:     {label: "Docker Compose", file: "compose.yaml"},
+  podman:      {label: "Podman",         file: "Containerfile"},
+  singularity: {label: "Apptainer / Singularity", file: "stata.def"},
+};
+const OSES = {linux: "Linux", mac: "macOS", windows: "Windows (PowerShell)"};
+// The OS tab starts on the visitor's own system.
+const UA = (typeof navigator !== "undefined" && navigator.userAgent) || "";
+let tool = "docker", os = /Windows/.test(UA) ? "windows" : /Mac OS X|Macintosh/.test(UA) ? "mac" : "linux";
+
+// Example license locations of a default Stata install; the user adjusts.
+function licPath(key) {
+  const now = key.endsWith("_5"), major = key.split("_")[0];
+  return {
+    linux:   now ? `/usr/local/statanow${major}/stata.lic` : `/usr/local/stata${major}/stata.lic`,
+    mac:     now ? "/Applications/StataNow/stata.lic" : "/Applications/Stata/stata.lic",
+    windows: now ? `C:\\Program Files\\StataNow${major}\\stata.lic` : `C:\\Program Files\\Stata${major}\\stata.lic`,
+  };
+}
+
+function context() {
   const v = version(), ed = $("esel").value, fl = $("fsel").value, tag = $("tsel").value;
   const suffix = (ed === "all" ? "" : "-" + ed) + (fl ? "-" + fl : "");
-  const image = `${HUBID}/stata${v.key}${suffix}`;
-  const bin = (EDITIONS[ed] || EDITIONS.mp).bin;
+  return {v, ed, fl, tag, image: `${HUBID}/stata${v.key}${suffix}`,
+          bin: (EDITIONS[ed] || EDITIONS.mp).bin, interactive: fl.startsWith("i")};
+}
 
-  $("pull").innerHTML =
-    cm("# " + image + " on Docker Hub: https://hub.docker.com/r/" + image) + "\n" +
-    `<span class="p">$</span> docker pull ${esc(image)}:${esc(tag)}`;
-
-  const from = ed === "all"
-    ? `FROM ${HUBID}/stata\${STATA_VERSION}:\${TAG}`
-    : `FROM ${HUBID}/stata\${STATA_VERSION}-\${EDITION}\${FLAVOR}:\${TAG}`;
+function dockerfile(c, registry) {
+  const from = c.ed === "all"
+    ? `FROM ${registry}${HUBID}/stata\${STATA_VERSION}:\${TAG}`
+    : `FROM ${registry}${HUBID}/stata\${STATA_VERSION}-\${EDITION}\${FLAVOR}:\${TAG}`;
   const lines = [
     cm("# syntax=docker/dockerfile:1.2"),
-    kw("ARG") + ` STATA_VERSION=${esc(v.key)}`,
+    kw("ARG") + ` STATA_VERSION=${esc(c.v.key)}`,
   ];
-  if (ed !== "all") {
-    lines.push(kw("ARG") + ` EDITION=${esc(ed)}`);
-    lines.push(kw("ARG") + ` FLAVOR=${esc(fl ? "-" + fl : "")}` + (fl ? "" : cm("   # standard flavor: no suffix")));
+  if (c.ed !== "all") {
+    lines.push(kw("ARG") + ` EDITION=${esc(c.ed)}`);
+    lines.push(kw("ARG") + ` FLAVOR=${esc(c.fl ? "-" + c.fl : "")}` + (c.fl ? "" : cm("   # standard flavor: no suffix")));
   }
   lines.push(
-    kw("ARG") + ` TAG=${esc(tag)}`,
-    kw("ARG") + ` STATA_BIN=${esc(bin)}`,
+    kw("ARG") + ` TAG=${esc(c.tag)}`,
+    kw("ARG") + ` STATA_BIN=${esc(c.bin)}`,
     "",
-    kw(from.split(" ")[0]) + from.slice(4),
+    kw("FROM") + esc(from.slice(4)),
     "",
     cm("# Install the packages your project needs (see setup.do)"),
     kw("COPY") + " code/setup.do /setup.do",
@@ -102,15 +121,198 @@ function render() {
     kw("VOLUME") + " /project",
     kw("WORKDIR") + " /project",
     cm("# Run the main file; mount the license at run time (never bake it in)"),
-    kw("ENTRYPOINT") + ` ["${esc(bin)}", "-b", "main.do"]`,
+    kw("ENTRYPOINT") + ` ["${esc(c.bin)}", "-b", "main.do"]`,
   );
-  $("dockerfile").innerHTML = lines.join("\n");
+  return lines;
+}
+
+function compose(c) {
+  const args = [`STATA_VERSION: "${c.v.key}"`];
+  if (c.ed !== "all") args.push(`EDITION: "${c.ed}"`, `FLAVOR: "${c.fl ? "-" + c.fl : ""}"`);
+  args.push(`TAG: "${c.tag}"`, `STATA_BIN: "${c.bin}"`);
+  return [
+    cm("# compose.yaml -- builds from the Dockerfile on the Docker tab,"),
+    cm("# saved next to it. STATALIC is the path to your stata.lic."),
+    kw("services:"),
+    "  " + kw("stata:"),
+    "    " + kw("build:"),
+    "      context: .",
+    "      " + kw("args:"),
+    ...args.map(a => "        " + esc(a)),
+    "      " + kw("secrets:") + cm("              # license available to setup.do only"),
+    "        - statalic",
+    "    image: myproject",
+    "    " + kw("volumes:"),
+    "      - type: bind" + cm("               # license, read-only, at run time"),
+    "        source: ${STATALIC}",
+    "        target: /usr/local/stata/stata.lic",
+    "        read_only: true",
+    "      - type: bind" + cm("               # your project folder"),
+    "        source: .",
+    "        target: /project",
+    kw("secrets:"),
+    "  " + kw("statalic:"),
+    "    file: ${STATALIC}",
+  ];
+}
+
+function singularityDef(c) {
+  return [
+    kw("Bootstrap:") + " docker",
+    kw("From:") + ` ${esc(c.image)}:${esc(c.tag)}`,
+    "",
+    kw("%files"),
+    "    code/setup.do /setup.do",
+    "",
+    kw("%post"),
+    cm("    # Install packages system-wide: at run time HOME is your own home"),
+    cm("    # directory, so Stata's default per-user ado folder would be empty"),
+    `    echo 'sysdir set PLUS "/usr/local/stata/ado/plus"' > /usr/local/stata/sysprofile.do`,
+    `    /usr/local/stata/${esc(c.bin)} do /setup.do`,
+    "",
+    kw("%runscript"),
+    `    exec /usr/local/stata/${esc(c.bin)} -b main.do "$@"`,
+  ];
+}
+
+// One command, split over lines with the shell's continuation character.
+function cmd(parts, ps) {
+  return parts.map(esc).join(ps ? " `\n    " : " \\\n    ");
+}
+
+function runCommands(c, t, o) {
+  const ps = o === "windows";
+  const lic = licPath(c.v.key)[o];
+  const L = [];
+  const setLic = () => {
+    L.push(cm("# Where your Stata license is (adjust to your install)"));
+    L.push(ps ? `$env:STATALIC = "${esc(lic)}"` : `export STATALIC="${esc(lic)}"`);
+    L.push("");
+  };
+  const S = ps ? "$env:STATALIC" : "$STATALIC";
+  const licMount = ps ? `"\${env:STATALIC}:/usr/local/stata/stata.lic:ro"` : `"$STATALIC":/usr/local/stata/stata.lic:ro`;
+  const projMount = ps ? `"\${PWD}:/project"` : `"$PWD":/project`;
+
+  if (t === "docker" || t === "podman") {
+    const exe = t;
+    setLic();
+    L.push(cm("# Build: the license is a build secret, used by setup.do but not stored in the image"));
+    L.push(cmd([`${exe} build`, `--secret "id=statalic,src=${S}"`, "-t myproject ."], ps));
+    L.push("");
+    L.push(cm("# Run main.do from this folder; results land here too"));
+    const extra = [];
+    if (t === "podman" && o === "linux")
+      extra.push("--userns=keep-id:uid=2000,gid=100");
+    L.push(cmd([`${exe} run --rm`, ...extra, `-v ${licMount}`, `-v ${projMount}`, "myproject"], ps));
+    if (t === "podman" && o === "linux")
+      L.push(cm("# keep-id maps you to the image's statauser (uid 2000) so files in this") + "\n" +
+             cm("# folder stay yours; on SELinux hosts (Fedora, RHEL) add :Z to -v ...:/project"));
+    if (t === "docker" && o === "linux")
+      L.push(cm("# The container runs as statauser (uid 2000): it needs write access") + "\n" +
+             cm("# to this folder, e.g. chmod -R o+w results"));
+    if (c.interactive) {
+      L.push("");
+      L.push(cm("# Or open interactive Stata instead of running main.do"));
+      L.push(cmd([`${exe} run -it --rm`, ...extra, `-v ${licMount}`, `-v ${projMount}`,
+                  `--entrypoint ${c.bin}`, "myproject"], ps));
+    }
+    if (t === "podman" && o !== "linux") {
+      L.push("");
+      L.push(cm("# Podman on " + (o === "mac" ? "macOS" : "Windows") + " runs inside a VM: start it once with"));
+      L.push("podman machine init; podman machine start");
+    }
+    return L;
+  }
+
+  if (t === "compose") {
+    setLic();
+    L.push(cm("# Build: compose passes the license to setup.do as the 'statalic' secret"));
+    L.push("docker compose build");
+    L.push("");
+    L.push(cm("# Run main.do from this folder; the license is mounted read-only"));
+    L.push("docker compose run --rm stata");
+    if (c.interactive) {
+      L.push("");
+      L.push(cm("# Or open interactive Stata instead of running main.do"));
+      L.push(`docker compose run --rm --entrypoint ${esc(c.bin)} stata`);
+    }
+    return L;
+  }
+
+  // Apptainer / Singularity: Linux only; macOS and Windows go through a Linux VM
+  if (o === "mac") {
+    L.push(cm("# Apptainer and Singularity run on Linux only. On a Mac, use a Linux VM,"));
+    L.push(cm("# e.g. Lima (brew install lima; limactl start --mount-writable; lima),"));
+    L.push(cm("# and run these commands inside it. Lima shares your home folder (and"));
+    L.push(cm("# your project in it), so copy stata.lic"));
+    L.push(cm("# there first: cp /Applications/StataNow/stata.lic ~/  (or .../Stata/)"));
+    L.push("");
+  } else if (o === "windows") {
+    L.push(cm("# Apptainer and Singularity run on Linux only. On Windows, install them"));
+    L.push(cm("# inside WSL2 (e.g. Ubuntu) and run these commands in the WSL shell."));
+    L.push(cm("# Windows drives appear under /mnt/c/..."));
+    L.push("");
+  }
+  const lin = o === "windows" ? licPath(c.v.key).windows.replace(/^C:\\/, "/mnt/c/").replace(/\\/g, "/")
+            : o === "mac" ? "$HOME/stata.lic" : licPath(c.v.key).linux;
+  L.push(cm("# Where your Stata license is (adjust to your install)"));
+  L.push(`export STATALIC="${esc(lin)}"`);
+  L.push("");
+  L.push(cm("# Build: the license is bound in for setup.do only (Apptainer 1.1+ or"));
+  L.push(cm("# SingularityCE 4+; for Singularity replace apptainer with singularity)"));
+  L.push(cmd(["apptainer build", `--bind "$STATALIC":/usr/local/stata/stata.lic`, "myproject.sif stata.def"], false));
+  L.push("");
+  L.push(cm("# Run main.do from this folder"));
+  L.push(cmd(["apptainer run", `--bind "$STATALIC":/usr/local/stata/stata.lic`,
+              `--bind "$PWD":/project --pwd /project`, "myproject.sif"], false));
+  L.push("");
+  L.push(cm("# Or skip the build and use the published image directly"));
+  L.push(cmd(["apptainer exec", `--bind "$STATALIC":/usr/local/stata/stata.lic`,
+              `--bind "$PWD":/project --pwd /project`,
+              `docker://${c.image}:${c.tag}`, `/usr/local/stata/${c.bin}` + (c.interactive ? "" : " -b main.do")], false));
+  return L;
+}
+
+function render() {
+  const c = context();
+  const pull = {
+    docker:      `docker pull ${c.image}:${c.tag}`,
+    compose:     `docker pull ${c.image}:${c.tag}`,
+    podman:      `podman pull docker.io/${c.image}:${c.tag}`,
+    singularity: `apptainer pull docker://${c.image}:${c.tag}`,
+  }[tool];
+  $("pull").innerHTML =
+    cm("# " + c.image + " on Docker Hub: https://hub.docker.com/r/" + c.image) + "\n" +
+    `<span class="p">$</span> ${esc(pull)}`;
+
+  const file = {
+    docker:      () => dockerfile(c, ""),
+    compose:     () => compose(c),
+    podman:      () => [cm("# Containerfile -- Podman's name for a Dockerfile; same syntax")]
+                         .concat(dockerfile(c, "docker.io/").slice(1)),
+    singularity: () => singularityDef(c),
+  }[tool]();
+  $("filettl").textContent = "Start a " + TOOLS[tool].file;
+  $("file").innerHTML = file.join("\n");
+  $("runttl").textContent = TOOLS[tool].label + " on " + OSES[os];
+  $("run").innerHTML = runCommands(c, tool, os).join("\n");
 
   const notes = [];
-  if (fl === "x" && NOTES.x) notes.push(NOTES.x);
-  if (ed === "all" && NOTES.all) notes.push(NOTES.all);
+  if (c.fl === "x" && NOTES.x) notes.push(NOTES.x);
+  if (c.ed === "all" && NOTES.all) notes.push(NOTES.all);
   $("note").hidden = !notes.length;
   $("note").textContent = notes.join(" ");
+}
+
+function tabs(id, items, current, onPick) {
+  const bar = $(id);
+  bar.innerHTML = Object.entries(items).map(([k, label]) =>
+    `<button type="button" role="tab" data-k="${k}" aria-selected="${k === current}">${esc(label)}</button>`).join("");
+  bar.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    bar.querySelectorAll("button").forEach(x => x.setAttribute("aria-selected", x === b));
+    onPick(b.dataset.k); render();
+  });
 }
 
 function copy(btnId, preId) {
@@ -149,7 +351,10 @@ function renderStats() {
   $("fsel").addEventListener("change", onFlavor);
   $("tsel").addEventListener("change", render);
   copy("copypull", "pull");
-  copy("copydf", "dockerfile");
+  copy("copyfile", "file");
+  copy("copyrun", "run");
+  tabs("tooltabs", Object.fromEntries(Object.entries(TOOLS).map(([k, t]) => [k, t.label])), tool, k => tool = k);
+  tabs("ostabs", OSES, os, k => os = k);
   renderStats();
   // newest version first; edition defaults to se, flavor to standard
   onVersion();
