@@ -22,6 +22,7 @@ nav_external_links:
     hide_icon: false
 
 exclude:
+  - DEPLOY-PREVIEW.md
   - build_data.py
   - Gemfile
   - Gemfile.lock

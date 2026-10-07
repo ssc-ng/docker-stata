@@ -8,6 +8,11 @@
 #           uploads the artifact. The refresh happens in CI only and lands
 #           in the deployed artifact; nothing is committed back.
 #   deploy: runs only for main (pushes, cron, manual runs), never PRs.
+#   preview: runs only for pull requests opened from a branch of this
+#           repository (not a fork -- forks can't read deploy secrets).
+#           Deploys the built site to Cloudflare Pages as a per-PR preview
+#           and posts (or updates) the preview link as a PR comment. See
+#           site/DEPLOY-PREVIEW.md for the one-time Cloudflare setup.
 #
 # New images are pushed to Docker Hub from a workstation, not from CI, so
 # nothing triggers a rebuild when a tag is pushed: run this workflow by
@@ -63,6 +68,24 @@ jobs:
         uses: actions/upload-pages-artifact@v5
         with:
           path: site/_site
+      - name: Build Jekyll site for the Cloudflare preview
+        # Cloudflare Pages serves PR previews at the domain root
+        # (pr-<n>.<project>.pages.dev/), not under /docker-stata/, so the
+        # main build's baseurl-prefixed asset links would 404 there and
+        # the preview would render unstyled. Rebuild into a separate
+        # directory with an empty baseurl for that deploy only; the
+        # GitHub Pages artifact above is unaffected.
+        run: bundle exec jekyll build --baseurl "" --destination _site-preview
+        working-directory: site
+      - name: Upload site artifact for preview deploy
+        # upload-pages-artifact above produces a Pages-specific tarball
+        # that wrangler can't consume, so the preview job needs its own
+        # plain copy of the built site.
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-preview
+          path: site/_site-preview
+          retention-days: 14
 
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
@@ -74,3 +97,38 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  preview:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write     # only for the PR comment
+    steps:
+      - name: Download site artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: site-preview
+          path: _site
+      - name: Deploy PR preview
+        id: preview
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy ./_site
+            --project-name=${{ github.event.repository.name }}
+            --branch=pr-${{ github.event.pull_request.number }}
+      - name: Publish preview link
+        if: steps.preview.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          URL: ${{ steps.preview.outputs.pages-deployment-alias-url }}
+        run: |
+          echo "📖 Preview: $URL" >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment "$PR" --repo "$REPO" --edit-last --create-if-none \
+            --body "📖 **Preview:** $URL — commit \`${GITHUB_SHA:0:7}\`"
