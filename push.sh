@@ -26,7 +26,7 @@ do
 done
 VERSION=${VERSION:-18}
 [[ -z $TAG ]] && TAG=$(date +%F) 
-SHORTDESC="Docker image for Stata, to be used in automation and reproducibility."
+SHORTDESC="$(cat "$(dirname "$0")/SHORTDESC")"
 TEMPLATE="README-containers.template.md"
 [[ -n $EARLY ]] && TEMPLATE="README-containers.early.md"
 EXTRAMD="README-containers.$VERSION.md"

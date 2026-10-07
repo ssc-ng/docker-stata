@@ -7,7 +7,7 @@
 #           and a Docker Hub login with write access to the target org.
 
 DST=${DST:-sscng}
-SHORTDESC="Docker image for Stata, to be used in automation and reproducibility."
+SHORTDESC="$(cat "$(dirname "$0")/SHORTDESC")"
 VERSION=
 DRYRUN=
 

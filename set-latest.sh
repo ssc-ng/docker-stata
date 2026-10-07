@@ -45,7 +45,7 @@ if [[ -z $TAG ]]; then
     exit 1
 fi
 
-SHORTDESC="Docker image for Stata, to be used in automation and reproducibility."
+SHORTDESC="$(cat "$(dirname "$0")/SHORTDESC")"
 TEMPLATE="README-containers.template.md"
 [[ -n $EARLY ]] && TEMPLATE="README-containers.early.md"
 EXTRAMD="README-containers.$VERSION.md"
