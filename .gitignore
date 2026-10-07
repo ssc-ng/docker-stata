@@ -6,3 +6,4 @@ Dockerfile.*
 *.swp
 .env
 README-containers.md
+.wrangler
