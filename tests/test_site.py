@@ -16,6 +16,22 @@ SITE = Path(__file__).resolve().parent.parent / "site"
 BASEURL = "/docker-stata"
 
 
+class SharedThemeTest(unittest.TestCase):
+    """The brand comes only from the ssc-ng-theme gem, so it can't drift here."""
+
+    def test_site_uses_the_gem(self):
+        self.assertIn('gem "ssc-ng-theme"', (SITE / "Gemfile").read_text())
+        self.assertIn("- ssc-ng-theme", (SITE / "_config.yml").read_text())
+
+    def test_config_sets_no_brand_values(self):
+        self.assertNotRegex((SITE / "_config.yml").read_text(), r"(?m)^(color_scheme|logo):")
+
+    def test_custom_styles_have_no_brand_values(self):
+        css = (SITE / "_sass/custom/custom.scss").read_text()
+        for value in ("#123a63", "18,58,99", "ui-monospace", "--navy", "--accent", "#6f8fb3", "#cfdcea", "#dce7f2", "#8fc1ec"):
+            self.assertNotIn(value, css)
+
+
 class ConfigTest(unittest.TestCase):
     def test_baseurl_and_url(self):
         cfg = (SITE / "_config.yml").read_text(encoding="utf-8")
