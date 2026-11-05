@@ -2,6 +2,8 @@ title: docker-stata
 description: Stata container images on Docker Hub, with a picker for every version, edition and flavor
 
 theme: just-the-docs
+plugins:
+  - ssc-ng-theme
 
 # The site is served from GitHub *project* Pages, i.e. under a path
 # prefix rather than at the host root. `url` is the origin only; the
@@ -11,7 +13,6 @@ url: "https://ssc-ng.net"
 baseurl: "/docker-stata"
 
 search_enabled: false
-color_scheme: light
 
 nav_external_links:
   - title: Docker Hub

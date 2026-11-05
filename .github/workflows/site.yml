@@ -1,5 +1,7 @@
 # Build and deploy the docker-stata website (site/ directory) via
-# Action-based GitHub Pages deployment using Jekyll (just-the-docs theme).
+# Action-based GitHub Pages deployment using Jekyll (just-the-docs theme, with the
+# shared look from the ssc-ng-theme gem, updated to its newest version on every
+# build).
 #
 #   build:  runs on every PR, every push to main, weekly by cron, and on
 #           demand. First refreshes the image catalogue embedded in the
@@ -51,10 +53,8 @@ jobs:
           python-version: "3.12"
       - name: Refresh embedded image catalogue from Docker Hub
         run: python3 site/build_data.py site/assets/js/picker.js
-      - uses: ruby/setup-ruby@v1
+      - uses: ssc-ng/theme/.github/actions/setup@v1
         with:
-          ruby-version: "3.3"
-          bundler-cache: true
           working-directory: site
       - name: Build Jekyll site
         run: bundle exec jekyll build
